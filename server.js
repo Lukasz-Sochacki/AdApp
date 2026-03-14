@@ -17,6 +17,11 @@ app.use('/api', adsRoutes);
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '/client/build')));
 app.use(express.static(path.join(__dirname, '/public')));
+app.use(express.static('public'));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '/client/build/index.html'));
+});
 
 //Connection with database
 mongoose.connect('mongodb://localhost:27017/adsDB');

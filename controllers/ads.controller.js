@@ -2,7 +2,7 @@ const Ad = require('../models/Ad.model');
 
 exports.getAll = async (req, res) => {
   try {
-    res.json(await Ad.find());
+    res.json(await Ad.find().populate('author', '-password'));
   } catch (err) {
     res.status(500).json({ message: err });
   }
@@ -10,7 +10,7 @@ exports.getAll = async (req, res) => {
 
 exports.getById = async (req, res) => {
   try {
-    const ad = await Ad.findById(req.params.id);
+    const ad = await Ad.findById(req.params.id).populate('author', '-password');
     if (!ad) return res.status(404).json({ message: 'Not found...' });
     else res.json(ad);
   } catch (err) {
@@ -21,9 +21,12 @@ exports.getById = async (req, res) => {
 exports.post = async (req, res) => {
   try {
     const { title, content, price, location, author } = req.body;
-    const newAd = new Ad({ title, content, price, location, author });
+
+    const image = req.file ? req.file.filename : '';
+
+    const newAd = new Ad({ title, content, price, location, author, image });
     await newAd.save();
-    res.json({ message: 'OK - post' });
+    res.json({ message: 'OK - post with image' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
