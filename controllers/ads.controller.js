@@ -4,7 +4,7 @@ exports.getAll = async (req, res) => {
   try {
     res.json(await Ad.find().populate('author', '-password'));
   } catch (err) {
-    res.status(500).json({ message: err });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -14,7 +14,7 @@ exports.getById = async (req, res) => {
     if (!ad) return res.status(404).json({ message: 'Not found...' });
     else res.json(ad);
   } catch (err) {
-    res.status(500).json({ message: err });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -42,7 +42,7 @@ exports.delete = async (req, res) => {
       res.status(404).json({ message: 'Not found...' });
     }
   } catch (err) {
-    res.status(500).json({ message: err });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -61,7 +61,7 @@ exports.put = async (req, res) => {
       res.status(404).json({ message: 'Not found...' });
     }
   } catch (err) {
-    res.status(500).json({ message: err });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -73,6 +73,6 @@ exports.search = async (req, res) => {
     });
     res.json(searchAd);
   } catch (err) {
-    res.status(500).json({ message: err });
+    res.status(500).json({ message: err.message });
   }
 };

@@ -1,0 +1,11 @@
+const express = require('express');
+const router = express.Router();
+
+const authController = require('../controllers/auth.controller');
+const imageUpload = require('../utils/imageUpload');
+
+router.post('/register', imageUpload.single('avatar'), authController.register);
+router.post('/login', authController.login);
+router.get('/user', authController.getUser);
+
+module.exports = router;

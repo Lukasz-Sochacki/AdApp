@@ -2,17 +2,40 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const session = require('express-session');
+const MongoStore = require('connect-mongo').default;
 
 const adsRoutes = require('./routes/ads.routes');
+const authRoutes = require('./routes/auth.routes');
+const usersRoutes = require('./routes/users.routes');
 
 const app = express();
+
+//Connection with database
+mongoose.connect('mongodb://localhost:27017/adsDB');
+const db = mongoose.connection;
+db.once('open', () => {
+  console.log('Connected to the adsDB database!');
+});
+db.on('error', (err) => console.log('Error' + err));
 
 //Middlewares
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false }));
+app.use(
+  session({
+    secret: 'xyz567',
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create(mongoose.connection),
+  }),
+);
 
+// Add routes
 app.use('/api', adsRoutes);
+app.use('/auth', authRoutes);
+app.use('/api', usersRoutes);
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '/client/build')));
@@ -22,14 +45,6 @@ app.use(express.static('public'));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/client/build/index.html'));
 });
-
-//Connection with database
-mongoose.connect('mongodb://localhost:27017/adsDB');
-const db = mongoose.connection;
-db.once('open', () => {
-  console.log('Connected to the adsDB database!');
-});
-db.on('error', (err) => console.log('Error' + err));
 
 app.get('/api/ads', async (req, res) => {
   try {
