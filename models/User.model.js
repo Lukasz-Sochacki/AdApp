@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  login: { type: String, required: true, unique: true, minlenght: 3 },
+  login: { type: String, required: true, minlenght: 3 },
   password: { type: String, required: true },
-  avatar: { type: String },
+  avatar: { type: String, required: true },
   phoneNumber: { type: Number, required: true, minlength: 9, maxlength: 12 },
 });
 

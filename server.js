@@ -1,9 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const session = require('express-session');
-const MongoStore = require('connect-mongo').default;
+const MongoStore = require('connect-mongo');
 
 const adsRoutes = require('./routes/ads.routes');
 const authRoutes = require('./routes/auth.routes');
@@ -20,15 +21,30 @@ db.once('open', () => {
 db.on('error', (err) => console.log('Error' + err));
 
 //Middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  }),
+);
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
+
+//Session configuration
 app.use(
   session({
     secret: 'xyz567',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create(mongoose.connection),
+    store: MongoStore.create({
+      mongoUrl: 'mongodb://localhost:27017/adsDB',
+    }),
+    cookie: {
+      secure: process.env.NODE_ENV == 'production',
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24,
+      sameSite: 'lax',
+    },
   }),
 );
 
@@ -38,27 +54,17 @@ app.use('/auth', authRoutes);
 app.use('/api', usersRoutes);
 
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, '/client/build')));
-app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.static('public'));
 
+app.use(express.static(path.join(__dirname, '/client/build')));
+
 app.get('*', (req, res) => {
+  if (req.url.startsWith('/api') || req.url.startsWith('/auth')) {
+    return next();
+  }
   res.sendFile(path.join(__dirname, '/client/build/index.html'));
 });
 
-app.get('/api/ads', async (req, res) => {
-  try {
-    const ads = await Ad.find();
-    res.json(ads);
-  } catch (err) {
-    res.status(500).json({ message: err });
-  }
-});
-
-app.get('/', (req, res) => {
-  res.send('<h1>WORKS!</h1>');
-});
-
-const server = app.listen(process.env.PORT || 8000, () => {
-  console.log('Server is running on port: 8000');
+const server = app.listen(process.env.PORT || 9000, () => {
+  console.log('Server is running on port: 9000');
 });
