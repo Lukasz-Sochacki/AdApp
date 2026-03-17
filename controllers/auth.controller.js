@@ -2,21 +2,30 @@ const User = require('../models/User.model');
 const bcrypt = require('bcryptjs');
 const Session = require('../models/Session.model');
 const getImageFileType = require('../utils/getImageFileType');
+const fs = require('fs');
+const path = require('path');
 
 exports.register = async (req, res) => {
   try {
     const { login, password, phoneNumber } = req.body;
     const fileType = req.file ? await getImageFileType(req.file) : 'unknown';
+    const isImageType = [
+      'image/png',
+      'image/jpeg',
+      'image/gif',
+      'image/jpg',
+    ].includes(fileType);
     if (
       login &&
       typeof login === 'string' &&
       password &&
       typeof password === 'string' &&
       req.file &&
-      ['image/png', 'image/jpeg', 'image/gif', 'image/jpg'].includes(fileType)
+      isImageType
     ) {
       const userWithLogin = await User.findOne({ login });
       if (userWithLogin) {
+        fs.unlinkSync(req.file.path);
         return res
           .status(409)
           .json({ message: 'User with this login already exists' });
@@ -29,9 +38,11 @@ exports.register = async (req, res) => {
       });
       res.status(201).send({ message: 'User created: ' + user.login });
     } else {
+      if (req.file) fs.unlinkSync(req.file.path);
       res.status(400).send({ message: 'Bad request...' });
     }
   } catch (err) {
+    if (req.file) fs.unlinkSync(req.file.path);
     res.status(500).send({ message: err.message });
   }
 };

@@ -19,6 +19,11 @@ router.post(
   AdController.post,
 );
 router.delete('/ads/:id', authMiddleware, AdController.delete);
-router.put('/ads/:id', authMiddleware, AdController.put);
+router.put(
+  '/ads/:id',
+  authMiddleware,
+  imageUpload.single('image'),
+  AdController.put,
+);
 
 module.exports = router;

@@ -54,14 +54,11 @@ app.use('/auth', authRoutes);
 app.use('/api', usersRoutes);
 
 // Serve static files from the React app
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, '/public')));
 
 app.use(express.static(path.join(__dirname, '/client/build')));
 
 app.get('*', (req, res) => {
-  if (req.url.startsWith('/api') || req.url.startsWith('/auth')) {
-    return next();
-  }
   res.sendFile(path.join(__dirname, '/client/build/index.html'));
 });
 
