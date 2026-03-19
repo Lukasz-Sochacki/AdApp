@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { fetchAds } from './redux/adsRedux';
 import { Routes, Route } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
+import { logIn } from './redux/usersRedux';
 // Pages
 import Home from './components/pages/Home/Home';
 // Views
@@ -17,11 +18,33 @@ import Search from './components/pages/Search/Search';
 import Login from './components/pages/Login/Login';
 import Logout from './components/pages/Logout/Logout';
 import Register from './components/pages/Register/Register';
+import { API_URL } from './config';
 
 const App = () => {
   const dispatch = useDispatch();
 
-  useEffect(() => dispatch(fetchAds(), [dispatch]));
+  useEffect(() => {
+    dispatch(fetchAds());
+
+    const checkUser = async () => {
+      try {
+        const options = {
+          credentials: 'include',
+        };
+        const res = await fetch(`${API_URL}/auth/user`, options);
+
+        if (res.status === 200) {
+          const userData = await res.json();
+          console.log('Dane z autologowania:', userData); // SPRAWDŹ TO W KONSOLI
+          dispatch(logIn(userData));
+        }
+      } catch (err) {
+        console.log('User not logged in or server error');
+      }
+    };
+
+    checkUser();
+  }, [dispatch]);
 
   return (
     <Container>

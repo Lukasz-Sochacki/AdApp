@@ -66,7 +66,10 @@ exports.login = async (req, res) => {
             login: user.login,
             avatar: user.avatar,
           };
-          res.status(200).send({ message: 'Login succesful!' });
+          res.status(200).send({
+            message: 'Login successful!',
+            user: req.session.user,
+          });
         } else {
           res.status(400).send({ message: 'Login or password are incorrect' });
         }
@@ -94,8 +97,4 @@ exports.logout = async (req, res) => {
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
-};
-
-exports.getUser = async (req, res) => {
-  res.send("Yeah! I'm logged");
 };
