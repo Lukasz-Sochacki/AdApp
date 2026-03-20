@@ -51,7 +51,9 @@ export const removeAdRequest = (id) => {
       method: 'DELETE',
       credentials: 'include',
     };
-    fetch(`${API_URL}/api/ads/${id}`, options).then(() => dispatch(fetchAds()));
+    return fetch(`${API_URL}/api/ads/${id}`, options).then(() =>
+      dispatch(fetchAds()),
+    );
   };
 };
 

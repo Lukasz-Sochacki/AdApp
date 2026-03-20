@@ -1,4 +1,4 @@
-import { useParams, Navigate, Link } from 'react-router-dom';
+import { useParams, Navigate, Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { getAdById, removeAdRequest } from '../../../redux/adsRedux';
 import { getUser } from '../../../redux/usersRedux';
@@ -10,11 +10,18 @@ const Ad = () => {
   const ad = useSelector((state) => getAdById(state, id));
   const user = useSelector(getUser);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   if (!ad) return <Navigate to='/' />;
 
   const handleDelete = (event) => {
     event.preventDefault();
+
+    if (window.confirm('Are you sure you want to remove this ad?')) {
+      dispatch(removeAdRequest(id)).then(() => {
+        navigate('/');
+      });
+    }
   };
 
   return (
