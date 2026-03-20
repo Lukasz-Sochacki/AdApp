@@ -57,6 +57,14 @@ export const removeAdRequest = (id) => {
   };
 };
 
+export const fetchAdsByPhrase = (phrase) => {
+  return (dispatch) => {
+    fetch(`${API_URL}/api/ads/search/${phrase}`)
+      .then((res) => res.json())
+      .then((ads) => dispatch(updateAds(ads)));
+  };
+};
+
 const adsReducer = (statePart = [], action) => {
   switch (action.type) {
     case UPDATE_ADS:
