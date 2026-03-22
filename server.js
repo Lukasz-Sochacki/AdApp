@@ -44,7 +44,7 @@ app.use(
       mongoUrl: dbUri,
     }),
     cookie: {
-      secure: process.env.NODE_ENV == 'production',
+      secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24,
       sameSite: 'lax',
@@ -60,10 +60,10 @@ app.use('/api', usersRoutes);
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '/public')));
 
-app.use(express.static(path.join(__dirname, '/client/build')));
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '/client/build/index.html'));
+  res.sendFile(path.join(__dirname, 'client/build/index.html'));
 });
 
 const PORT = process.env.PORT || 9000;
