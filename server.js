@@ -12,13 +12,12 @@ const usersRoutes = require('./routes/users.routes');
 
 const app = express();
 
-//Connection with database
-// mongodb+srv://kodilla:kodilla@cluster0.5twsm5j.mongodb.net/adsDB?appName=Cluster0
-// mongodb://localhost:27017/adsDB
+const dbUri =
+  process.env.NODE_ENV === 'production'
+    ? `mongodb+srv://kodilla:${process.env.DB_PASS}@cluster0.5twsm5j.mongodb.net/adsDB?appName=Cluster0`
+    : 'mongodb://localhost:27017/adsDB';
 
-mongoose.connect(
-  `mongodb+srv://kodilla:${process.env.DB_PASS}@cluster0.5twsm5j.mongodb.net/adsDB?appName=Cluster0`,
-);
+mongoose.connect(dbUri);
 const db = mongoose.connection;
 db.once('open', () => {
   console.log('Connected to the adsDB database!');
@@ -28,7 +27,7 @@ db.on('error', (err) => console.log('Error' + err));
 //Middlewares
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: true,
     credentials: true,
   }),
 );
@@ -42,7 +41,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: 'mongodb://localhost:27017/adsDB',
+      mongoUrl: dbUri,
     }),
     cookie: {
       secure: process.env.NODE_ENV == 'production',
@@ -67,6 +66,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/client/build/index.html'));
 });
 
-const server = app.listen(process.env.PORT || 9000, () => {
-  console.log('Server is running on port: 9000');
+const PORT = process.env.PORT || 9000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on port: ${PORT}`);
 });
