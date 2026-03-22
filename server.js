@@ -13,7 +13,12 @@ const usersRoutes = require('./routes/users.routes');
 const app = express();
 
 //Connection with database
-mongoose.connect('mongodb://localhost:27017/adsDB');
+// mongodb+srv://kodilla:kodilla@cluster0.5twsm5j.mongodb.net/adsDB?appName=Cluster0
+// mongodb://localhost:27017/adsDB
+
+mongoose.connect(
+  `mongodb+srv://kodilla:${process.env.DB_PASS}@cluster0.5twsm5j.mongodb.net/adsDB?appName=Cluster0`,
+);
 const db = mongoose.connection;
 db.once('open', () => {
   console.log('Connected to the adsDB database!');
@@ -33,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 //Session configuration
 app.use(
   session({
-    secret: 'xyz567',
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
